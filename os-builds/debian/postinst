@@ -3,7 +3,6 @@
 if ! id "dyndns-agent" &>/dev/null; then
     # Create the system user
 	useradd \
-		--create-home \
 		--no-create-home \
 		--shell /usr/bin/nologin \
 		--group daemon \
