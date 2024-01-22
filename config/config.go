@@ -53,7 +53,7 @@ func Load() error {
 		// Define config path
 		path := *argConfigPath
 		if path == "" {
-			path = "./config.ini"
+			path = "/etc/dyndns-agent/config.ini"
 		}
 
 		// Load the configuration file
