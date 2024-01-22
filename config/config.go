@@ -38,12 +38,15 @@ func Load() error {
 		}
 
 		// Set variabes
-		var Data *Config
-		Data.ID = envAPIID
-		Data.Key = envAPIKey
-		Data.Endpoint = envEndpoint
-		Data.Interval, _ = strconv.Atoi(envInterval)
-		Data.Protocol = envProtocol
+		var confData Config
+		confData.ID = envAPIID
+		confData.Key = envAPIKey
+		confData.Endpoint = envEndpoint
+		confData.Interval, _ = strconv.Atoi(envInterval)
+		confData.Protocol = envProtocol
+
+		// Write to global var
+		Data = &confData
 
 	} else {
 
