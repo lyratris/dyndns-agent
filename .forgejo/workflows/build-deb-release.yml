@@ -79,7 +79,7 @@ jobs:
           go-version: '1.21'
 
       - name: Build DNS Agent
-        run: go mod tidy && && env GOOS=linux GOARCH=arm64 go build -o ./dyndns-agent
+        run: go mod tidy && env GOOS=linux GOARCH=arm64 go build -o ./dyndns-agent
 
       - name: Set package version & architecture
         run: |

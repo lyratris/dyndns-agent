@@ -36,7 +36,7 @@ Using docker compose `docker-compose-yaml`:
 ``` yaml
 version: "3"
 services:
-    ironforge:
+    dyndns-agent:
         image: forge.lyratris.com/public/dyndns-agent:dev
         environment:
             - LTRS_DDNS_API_ID=00000000-0000-0000-0000-000000000000
