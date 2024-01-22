@@ -38,6 +38,7 @@ func Load() error {
 		}
 
 		// Set variabes
+		var Data *Config
 		Data.ID = envAPIID
 		Data.Key = envAPIKey
 		Data.Endpoint = envEndpoint
