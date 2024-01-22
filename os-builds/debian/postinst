@@ -22,7 +22,7 @@ fi
 chown -R dyndns-agent:dyndns-agent /etc/dyndns-agent
 
 # Enable the service
-systemctl enable lyratris-dnsagent.service
+systemctl enable dyndns-agent.service
 
 # Explicitly exit 0
 exit 0
