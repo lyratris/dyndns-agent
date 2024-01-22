@@ -1,0 +1,15 @@
+[Unit]
+Description=Lyratris DynDNS Agent
+After=network.target network-online.target
+Requires=network-online.target
+
+[Service]
+StartLimitIntervalSec=0
+Type=simple
+Restart=always
+RestartSec=10
+User=lyratrisdns
+ExecStart=/usr/bin/dyndns-agent
+
+[Install]
+WantedBy=multi-user.target

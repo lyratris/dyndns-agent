@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Disable and stop the service
+systemctl disable --now dyndns-agent.service
+
+# Remove the user
+userdel dyndns-agent
+
+# Explicitly exit 0
+exit 0

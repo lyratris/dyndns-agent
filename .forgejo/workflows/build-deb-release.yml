@@ -1,0 +1,109 @@
+name: Build and publish deb package
+
+on:
+  push:
+    branches: [ release/v* ]
+
+jobs:
+  publish-deb-package-amd64:
+    runs-on: docker
+    container:
+      image: catthehacker/ubuntu:act-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Get cleaned branch name
+        id: clean_name
+        run: |
+          REF_NAME=$(echo "${{ github.ref }}" | sed -e 's/refs\/heads\///' -e 's/refs\/tags\///' -e 's/release\/v//')
+          echo "Cleaned name is ${REF_NAME}"
+          echo "branch=${REF_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Setup go enviroment
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Build DNS Agent
+        run: go build -o ./dyndns-agent
+
+      - name: Set package version & architecture
+        run: |
+          sed -i 's/{VERSION}/${{ steps.clean_name.outputs.branch }}/g' -i ./build/debian/control
+          sed -i 's/{ARCH}/amd64/g' -i ./build/debian/control
+
+      - name: Build deb package
+        run: |
+          mkdir -p /tmp/release
+          mkdir -p /tmp/dyndns-agent/DEBIAN
+          mkdir -p /tmp/dyndns-agent/usr/bin
+          mkdir -p /tmp/dyndns-agent/lib/systemd/system/
+          mkdir -p /tmp/dyndns-agent/usr/share/dyndns-agent
+          cp ./dyndns-agent /tmp/dyndns-agent/usr/bin/
+          cp -r ./os-builds/debian/* /tmp/dyndns-agent/DEBIAN/
+          cp ./config.ini /tmp/dyndns-agent/usr/share/dyndns-agent/
+          cp ./os-builds/dyndns-agent.service /tmp/dyndns-agent/lib/systemd/system/
+          chmod -R 755 /tmp/dyndns-agent/DEBIAN/*
+          dpkg-deb --root-owner-group --build /tmp/dyndns-agent /tmp/release/dyndns-agent.deb
+
+      - name: Upload to repository
+        run: |
+          curl --user ltrs:${{ secrets.REGISTRY_PASSWORD }} --upload-file /tmp/release/dyndns-agent.deb https://forge.lyratris.com/api/packages/public/debian/pool/bookworm/main/upload
+          curl --user ltrs:${{ secrets.REGISTRY_PASSWORD }} --upload-file /tmp/release/dyndns-agent.deb https://forge.lyratris.com/api/packages/public/debian/pool/bullseye/main/upload
+          curl --user ltrs:${{ secrets.REGISTRY_PASSWORD }} --upload-file /tmp/release/dyndns-agent.deb https://forge.lyratris.com/api/packages/public/ubuntu/pool/jammy/main/upload
+          curl --user ltrs:${{ secrets.REGISTRY_PASSWORD }} --upload-file /tmp/release/dyndns-agent.deb https://forge.lyratris.com/api/packages/public/ubuntu/pool/lunar/main/upload
+          curl --user ltrs:${{ secrets.REGISTRY_PASSWORD }} --upload-file /tmp/release/dyndns-agent.deb https://forge.lyratris.com/api/packages/public/ubuntu/pool/mantic/main/upload
+
+
+  publish-deb-package-arm64:
+    runs-on: docker
+    container:
+      image: catthehacker/ubuntu:act-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Get cleaned branch name
+        id: clean_name
+        run: |
+          REF_NAME=$(echo "${{ github.ref }}" | sed -e 's/refs\/heads\///' -e 's/refs\/tags\///' -e 's/release\/v//')
+          echo "Cleaned name is ${REF_NAME}"
+          echo "branch=${REF_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Setup go enviroment
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Build DNS Agent
+        run: env GOOS=linux GOARCH=arm64 go build -o ./dyndns-agent
+
+      - name: Set package version & architecture
+        run: |
+          sed -i 's/{VERSION}/${{ steps.clean_name.outputs.branch }}/g' -i ./build/debian/control
+          sed -i 's/{ARCH}/arm64/g' -i ./build/debian/control
+
+      - name: Build deb package
+        run: |
+          mkdir -p /tmp/release
+          mkdir -p /tmp/dyndns-agent/DEBIAN
+          mkdir -p /tmp/dyndns-agent/usr/bin
+          mkdir -p /tmp/dyndns-agent/lib/systemd/system/
+          mkdir -p /tmp/dyndns-agent/usr/share/dyndns-agent
+          cp ./dyndns-agent /tmp/dyndns-agent/usr/bin/
+          cp -r ./os-builds/debian/* /tmp/dyndns-agent/DEBIAN/
+          cp ./config.ini /tmp/dyndns-agent/usr/share/dyndns-agent/
+          cp ./os-builds/dyndns-agent.service /tmp/dyndns-agent/lib/systemd/system/
+          chmod -R 755 /tmp/dyndns-agent/DEBIAN/*
+          dpkg-deb --root-owner-group --build /tmp/dyndns-agent /tmp/release/dyndns-agent.deb
+
+      - name: Upload to repository
+        run: |
+          curl --user ltrs:${{ secrets.REGISTRY_PASSWORD }} --upload-file /tmp/release/dyndns-agent.deb https://forge.lyratris.com/api/packages/public/debian/pool/bookworm/main/upload
+          curl --user ltrs:${{ secrets.REGISTRY_PASSWORD }} --upload-file /tmp/release/dyndns-agent.deb https://forge.lyratris.com/api/packages/public/debian/pool/bullseye/main/upload
+          curl --user ltrs:${{ secrets.REGISTRY_PASSWORD }} --upload-file /tmp/release/dyndns-agent.deb https://forge.lyratris.com/api/packages/public/ubuntu/pool/jammy/main/upload
+          curl --user ltrs:${{ secrets.REGISTRY_PASSWORD }} --upload-file /tmp/release/dyndns-agent.deb https://forge.lyratris.com/api/packages/public/ubuntu/pool/lunar/main/upload
+          curl --user ltrs:${{ secrets.REGISTRY_PASSWORD }} --upload-file /tmp/release/dyndns-agent.deb https://forge.lyratris.com/api/packages/public/ubuntu/pool/mantic/main/upload

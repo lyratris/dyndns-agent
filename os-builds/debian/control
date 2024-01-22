@@ -1,0 +1,8 @@
+Package: dyndns-agent
+Version: {VERSION}
+Section: utils
+Priority: optional
+Architecture: {ARCH}
+Maintainer: Lyratris Limited <contact@lyratris.com>
+Description: Agent to update DynDNS endpoints of the Lyratris DNS platform
+Homepage: https://lyratris.com
